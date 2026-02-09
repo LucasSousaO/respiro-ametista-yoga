@@ -41,6 +41,26 @@
   gap:16px;
   flex-wrap:wrap;
 }
+.next-event {
+  padding: 14px 0;
+  background: rgba(109, 76, 255, 0.06);
+}
+
+.next-event-label {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--muted);
+  margin: 0 0 4px;
+}
+
+.next-event-value {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+
 
 .badge{
   display:inline-flex;

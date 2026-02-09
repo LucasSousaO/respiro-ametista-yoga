@@ -5,3 +5,4 @@
     window.dataLayer.push(Object.assign({ event: eventName }, payload || {}));
   };
 })();
+
