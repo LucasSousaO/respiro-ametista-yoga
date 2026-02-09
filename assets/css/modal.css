@@ -1,70 +1,150 @@
-footer-inner
-
-
+/* =========================================================
+   MODAL – Base
+   ========================================================= */
 
 .modal{
   position: fixed;
   inset: 0;
-  background: #fff;
+  background: #fff; /* mobile full-screen */
   display: none;
   z-index: 2000;
+
+  /* UX */
+  overscroll-behavior: contain;
 }
 
-.modal.is-open{ display:block; }
+.modal.is-open{
+  display: block;
+}
+
+/* trava scroll da página */
+body.modal-open{
+  overflow: hidden;
+  touch-action: none;
+}
+
+/* =========================================================
+   MODAL – Estrutura
+   ========================================================= */
 
 .modal-sheet{
-  width:100%;
-  height:100%;
-  display:flex;
-  flex-direction:column;
-  background:#fff;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
 }
 
+/* topo */
 .modal-top{
-  height:52px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  padding:0 14px;
-  border-bottom:1px solid var(--line);
+  height: 52px;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 14px;
+  border-bottom: 1px solid var(--line);
+  background: #fff;
+  z-index: 2;
 }
-.modal-top strong{ font-size:13px; }
 
+.modal-top strong{
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* botão fechar (texto) */
 .link-close{
-  background:transparent;
-  border:0;
-  font-weight:800;
+  background: transparent;
+  border: 0;
+  font-weight: 700;
+  font-size: 13px;
   color: var(--accent);
-  cursor:pointer;
+  cursor: pointer;
+  padding: 6px;
 }
 
+/* botão invisível (acessibilidade / binding JS) */
 .modal-close{
-  position:absolute;
-  width:1px; height:1px;
-  opacity:0; /* existe só pra acessibilidade e binding */
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
+
+/* =========================================================
+   IFRAME
+   ========================================================= */
 
 .modal iframe{
-  width:100%;
-  height:100%;
-  border:0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #fff;
 }
 
-/* Desktop: modal centralizado */
+/* =========================================================
+   DESKTOP / TABLET
+   ========================================================= */
+
 @media (min-width: 860px){
+
   .modal{
+    display: none;
     background: rgba(0,0,0,.45);
-    display:none;
-    align-items:center;
-    justify-content:center;
+
+    align-items: center;
+    justify-content: center;
   }
-  .modal.is-open{ display:flex; }
+
+  .modal.is-open{
+    display: flex;
+  }
 
   .modal-sheet{
     width: min(560px, 92vw);
     height: min(92vh, 900px);
     border-radius: 18px;
-    overflow:hidden;
+    overflow: hidden;
     box-shadow: var(--shadow);
+    animation: modalIn .22s ease-out;
   }
+}
+
+/* =========================================================
+   ANIMAÇÃO (desktop)
+   ========================================================= */
+
+@keyframes modalIn{
+  from{
+    opacity: 0;
+    transform: translateY(8px) scale(.98);
+  }
+  to{
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* =========================================================
+   ACESSIBILIDADE
+   ========================================================= */
+
+.modal:focus{
+  outline: none;
+}
+
+.link-close:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* =========================================================
+   SEGURANÇA MOBILE (iOS)
+   ========================================================= */
+
+/* impede scroll do fundo mas mantém iframe funcional */
+.modal.is-open{
+  overscroll-behavior: contain;
 }
