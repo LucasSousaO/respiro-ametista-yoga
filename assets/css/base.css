@@ -1,15 +1,19 @@
 :root{
-  --bg:#fff;
-  --ink:#1f1f1f;
-  --muted:#6d6d6d;
-  --line: rgba(0,0,0,.08);
-  --soft:#f7f7f9;
-  --accent:#cf5f36;
-  --accent-2:#e8c8bb;
-  --radius: 16px;
-  --shadow: 0 12px 30px rgba(0,0,0,.10);
-  --wrap: 1080px;
+  --bg:#fbfafc;
+  --card:#ffffff;
+  --ink:#1f1f24;
+  --muted:#6c6c78;
+  --line:rgba(20,20,30,.10);
+
+  /* Roxo "respiro" */
+  --accent:#6d4cff;        /* roxo principal */
+  --accent-2:#efeaff;      /* roxo bem claro */
+  --accent-ink:#2a1f66;
+
+  --radius:18px;
+  --shadow:0 10px 24px rgba(16, 10, 30, .08);
 }
+
 
 *{ box-sizing:border-box; }
 html,body{ height:100%; }

@@ -67,6 +67,19 @@
   text-align:center;
 }
 
+.menu-btn{
+  width:44px;
+  height:44px;
+  border:none;
+  background:transparent;
+  border-radius:12px;
+}
+
+.menu-btn:hover{
+  background:rgba(109,76,255,.08);
+}
+
+
 @media (min-width: 860px){
   .menu-toggle{ display:none; }
 
