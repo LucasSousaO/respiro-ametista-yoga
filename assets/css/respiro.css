@@ -150,7 +150,7 @@
       rgba(109,76,255,.08),
       rgba(109,76,255,.08)
     ),
-    url("../img/hero-respiro.jpg") center / cover no-repeat;
+    url("../images/respiro.webp") center / cover no-repeat;
 }
 
 /* ================================
@@ -544,7 +544,7 @@
   /* troque a imagem se quiser */
   background:
     linear-gradient(180deg, rgba(0,0,0,.12), rgba(0,0,0,.28)),
-    url("../img/hero.jpg") center/cover no-repeat;
+    url("../images/respiro.webp") center/cover no-repeat;
 }
 
 /* =========================
