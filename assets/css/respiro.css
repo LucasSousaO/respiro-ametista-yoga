@@ -34,6 +34,14 @@
   gap:28px;
 }
 
+.footer-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+}
+
 .badge{
   display:inline-flex;
   padding:8px 14px;
@@ -319,13 +327,7 @@
   border-top:1px solid var(--line);
 }
 
-.footer-inner{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:16px;
-  flex-wrap:wrap;
-}
+
 
 .footer-text{
   display:grid;
