@@ -403,7 +403,7 @@
   --wrap: 1120px;
 }
 
-.wrap{ max-width:var(--wrap); margin:0 auto; padding:0 16px; }
+.wrap{ max-width:var(--wrap); margin:0 auto; padding:10px; }
 
 /* =========================
    HERO (mais “experiência”)
@@ -574,7 +574,7 @@
    “PAUSE” SECTION
 ========================= */
 .pause{
-  padding: 30px 0 26px;
+  padding: 15px 0 15px;
 }
 
 .pause-inner{
@@ -790,7 +790,7 @@
 }
 
 .footer-inner{
-  display:flex;
+  display:-webkit-box;
   flex-direction: column;
   gap: 12px;
   align-items:flex-start;
@@ -829,7 +829,7 @@
    Desktop
 ========================= */
 @media (min-width: 860px){
-  .wrap{ padding: 0 22px; }
+  .wrap{ padding: 10px; }
 
   .hero{
     padding: 34px 0 18px;
