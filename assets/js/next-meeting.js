@@ -17,8 +17,8 @@
     const today = new Date();
     today.setHours(0,0,0,0);
 console.log(today);
+console.log(rows);
     const upcoming = rows
-    console.log(upcoming);
       .map(r => ({
         date: new Date(r[0]),
         hour: r[1],
