@@ -239,7 +239,8 @@
   margin-top:28px;
   padding:20px;
   border-radius:var(--radius);
-  background:var(--accent-soft);
+  background:radial-gradient(900px 420px at 20% 10%, rgba(210,194,220,.25), transparent 60%),
+    var(--accent);
   display:flex;
   align-items:center;
   justify-content:space-between;
