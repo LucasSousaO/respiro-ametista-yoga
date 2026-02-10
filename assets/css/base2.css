@@ -17,8 +17,6 @@
 
 /* Ex.: seus meta-items (Duração / Plataforma / Valor) */
 .meta-item{
-  background: rgba(253,242,231,.75); /* laranja claro translúcido */
-  border: 1px solid rgba(198,104,38,.12); /* borda bem sutil */
   border-radius: 14px;                /* menos “pill de botão” */
   box-shadow: none;                   /* remove sombra de botão */
 }
