@@ -59,7 +59,7 @@ body.modal-open{
   border: 0;
   font-weight: 700;
   font-size: 13px;
-  color: var(--accent);
+  color: rgba(198,104,34,.90);
   cursor: pointer;
   padding: 6px;
 }
