@@ -809,12 +809,6 @@
   background: #fff;
 }
 
-.footer-inner{
-  display:flex;
-  flex-direction: column;
-  gap: 12px;
-  align-items:flex-start;
-}
 
 .footer-text small{
   display:block;
@@ -887,6 +881,12 @@
   .footer{
     padding-bottom: 28px;
   }
+  .footer-inner{
+  display:-webkit-box;
+  flex-direction: column;
+  gap: 12px;
+  align-items:flex-start;
+}
 
   .sticky-cta{
     display:none;
