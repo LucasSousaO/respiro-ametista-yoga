@@ -16,7 +16,7 @@
 
     const today = new Date();
     today.setHours(0,0,0,0);
-
+console.log(today);
     const upcoming = rows
       .map(r => ({
         date: new Date(r[0]),
@@ -41,7 +41,7 @@
     });
 
     el.textContent = `${formattedDate} • ${upcoming.hour} • Online`;
-
+console.log(textContent);
   } catch (err){
     console.error('Erro ao carregar encontro:', err);
     el.textContent = 'Próximo encontro a definir.';
