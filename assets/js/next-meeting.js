@@ -1,34 +1,48 @@
-(async function loadNextEventFromSheet(){
+(async function loadNextEvent(){
   const el = document.getElementById('nextEvent');
   if (!el) {
-    console.warn('[next-event] Elemento #nextEvent não encontrado');
+    console.warn('[next-event] #nextEvent não encontrado');
     return;
   }
 
-  const SHEET_URL =
-    'https://docs.google.com/spreadsheets/d/e/2PACX-1vR1T9RgURIVxLay_Y2B7Ev95KbdZHMfwMu0PW3DRXQY4h6Y9H6EQWQ-IM8wWtc55Fl0vTZBrV0SgsUV/pubhtml?gid=1239935155&single=true&range=F1&output=tsv';
+  const SHEET_ID = '2PACX-1vR1T9RgURIVxLay_Y2B7Ev95KbdZHMfwMu0PW3DRXQY4h6Y9H6EQWQ-IM8wWtc55Fl0vTZBrV0SgsUV';
+  const GID = '1239935155';
 
-  console.log('[next-event] Buscando valor em F1…');
+  const URL =
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?` +
+    `gid=${GID}&tq=${encodeURIComponent('SELECT F LIMIT 1')}`;
+
+  console.log('[next-event] Fetch URL:', URL);
 
   try {
-    const res = await fetch(SHEET_URL);
+    const res = await fetch(URL);
     const text = await res.text();
 
     console.log('[next-event] Resposta bruta:', text);
 
-    const value = text.trim();
+    // remove wrapper JS do Google
+    const json = JSON.parse(
+      text
+        .replace(/^[\s\S]*?\(/, '')
+        .replace(/\);?\s*$/, '')
+    );
+
+    console.log('[next-event] JSON parseado:', json);
+
+    const value =
+      json?.table?.rows?.[0]?.c?.[0]?.v;
+
+    console.log('[next-event] Valor F1:', value);
 
     if (!value) {
-      console.warn('[next-event] F1 vazia');
       el.textContent = 'Próximo encontro a definir.';
       return;
     }
 
     el.textContent = value;
-    console.log('[next-event] Valor exibido:', value);
 
   } catch (err) {
-    console.error('[next-event] Erro ao carregar F1:', err);
+    console.error('[next-event] Erro:', err);
     el.textContent = 'Próximo encontro a definir.';
   }
 })();
