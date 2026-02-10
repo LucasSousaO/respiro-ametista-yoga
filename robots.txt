@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://respiro.ametistayoga.com.br/sitemap.xml
