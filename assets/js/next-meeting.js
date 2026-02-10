@@ -1,124 +1,185 @@
 (async function loadNextEvent(){
   const el = document.getElementById('nextEvent');
-  console.log('[Respiro] Elemento nextEvent encontrado?', !!el);
+  console.log('[Respiro] Elemento #nextEvent encontrado?', !!el);
   if(!el) return;
 
+  // Mantive seu pubhtml + output=tsv. Se o Google devolver gviz, a gente parseia.
   const SHEET_URL =
-    'https://docs.google.com/spreadsheets/d/e/2PACX-1vR1T9RgURIVxLay_Y2B7Ev95KbdZHMfwMu0PW3DRXQY4h6Y9H6EQWQ-IM8wWtc55Fl0vTZBrV0SgsUV/pubhtml?gid=1239935155&single=true';
+    'https://docs.google.com/spreadsheets/d/e/2PACX-1vR1T9RgURIVxLay_Y2B7Ev95KbdZHMfwMu0PW3DRXQY4h6Y9H6EQWQ-IM8wWtc55Fl0vTZBrV0SgsUV/pubhtml?gid=1239935155&single=true&output=tsv';
 
-  function parseBRDate(ddmmyyyy){
-    console.log('[parseBRDate] valor recebido:', ddmmyyyy);
+  function setFallback(){
+    el.textContent = 'Próximo encontro a definir.';
+  }
 
-    const s = String(ddmmyyyy ?? '').trim();
-    const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
-    if(!m){
-      console.warn('[parseBRDate] formato inválido:', s);
-      return null;
-    }
-
-    const dd = Number(m[1]);
-    const mm = Number(m[2]);
-    const yyyy = Number(m[3]);
-
+  function parseBRDateStr(s){
+    const raw = String(s ?? '').trim();
+    const m = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if(!m) return null;
+    const dd = Number(m[1]), mm = Number(m[2]), yyyy = Number(m[3]);
     const d = new Date(yyyy, mm - 1, dd);
     d.setHours(0,0,0,0);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
 
-    console.log('[parseBRDate] data convertida:', d);
-
+  // Google Sheets / Excel serial date -> Date
+  function serialToDate(serial){
+    // No Google Sheets, 1 = 1899-12-31 (similar ao Excel, com offset).
+    // A base mais prática: 1899-12-30.
+    const n = Number(serial);
+    if(!Number.isFinite(n)) return null;
+    const base = new Date(Date.UTC(1899, 11, 30));
+    const d = new Date(base.getTime() + n * 86400000);
+    d.setHours(0,0,0,0);
     return Number.isNaN(d.getTime()) ? null : d;
   }
 
   function parseBool(v){
-    console.log('[parseBool] valor recebido:', v);
+    if (typeof v === 'boolean') return v;
     const s = String(v ?? '').trim().toLowerCase();
-    const result =
-      s === 'true' ||
-      s === 'verdadeiro' ||
-      s === '1' ||
-      s === 'yes' ||
-      s === 'x';
-
-    console.log('[parseBool] convertido para:', result);
-    return result;
+    return (s === 'true' || s === 'verdadeiro' || s === '1' || s === 'yes' || s === 'x');
   }
 
-  try {
-    console.log('[Respiro] Buscando planilha...');
-    const res = await fetch(SHEET_URL, { cache: 'no-store' });
-    console.log('[Respiro] Status fetch:', res.status);
+  function extractGvizJson(text){
+    // formato típico:
+    // google.visualization.Query.setResponse({...});
+    const marker = 'setResponse(';
+    const i = text.indexOf(marker);
+    if(i === -1) return null;
 
-    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const start = i + marker.length;
+    const end = text.lastIndexOf(');');
+    if(end === -1) return null;
 
-    const tsv = await res.text();
-    console.log('[Respiro] TSV bruto:\n', tsv);
+    const jsonLike = text.slice(start, end).trim();
+    console.log('[GVIZ] Trecho JSON extraído (início):', jsonLike.slice(0, 200));
+    return jsonLike;
+  }
 
-    const lines = tsv
+  function parseGviz(text){
+    const jsonStr = extractGvizJson(text);
+    if(!jsonStr) return null;
+
+    let data;
+    try {
+      data = JSON.parse(jsonStr);
+    } catch (e){
+      console.error('[GVIZ] Falhou JSON.parse do trecho extraído', e);
+      return null;
+    }
+
+    const rows = data?.table?.rows || [];
+    console.log('[GVIZ] Quantidade de linhas:', rows.length);
+
+    // Esperado:
+    // A: data -> col 0
+    // B: hora -> col 1
+    // D: agendado -> col 3
+    // Em GVIZ: row.c = [{v:...}, {v:...}, {v:...}, {v:true/false}]
+    const parsed = rows.map((r, idx) => {
+      const c = r?.c || [];
+      const vA = c[0]?.v; // pode ser serial number
+      const vB = c[1]?.v; // string hora
+      const vD = c[3]?.v; // boolean
+
+      const date =
+        (typeof vA === 'number' ? serialToDate(vA) : parseBRDateStr(vA));
+
+      const hour = String(vB ?? '').trim();
+      const active = parseBool(vD);
+
+      console.log(`[GVIZ] Linha ${idx}`, { vA, vB, vD, date, hour, active });
+
+      return { date, hour, active };
+    });
+
+    return parsed;
+  }
+
+  function parseTSVorCSV(text){
+    // tenta TSV primeiro; se não tiver \t, tenta CSV
+    const cleaned = text
       .split('\n')
       .map(l => l.replace(/\r/g, '').trim())
       .filter(Boolean);
 
-    console.log('[Respiro] Linhas parseadas:', lines);
+    console.log('[TEXT] Linhas brutas:', cleaned.length);
+    if(cleaned.length <= 1) return [];
 
-    const dataLines = lines.slice(1);
-    console.log('[Respiro] Linhas sem cabeçalho:', dataLines);
+    const sample = cleaned[0];
+    const isTSV = sample.includes('\t');
+    const sep = isTSV ? '\t' : ',';
+
+    console.log('[TEXT] Detecção:', { isTSV, sep });
+
+    const rows = cleaned.slice(1).map((line, idx) => {
+      const cols = line.split(sep);
+      const date = parseBRDateStr(cols[0]) || serialToDate(cols[0]);
+      const hour = String(cols[1] ?? '').trim();
+      const active = parseBool(cols[3]);
+
+      console.log(`[TEXT] Linha ${idx}`, { cols, date, hour, active });
+
+      return { date, hour, active };
+    });
+
+    return rows;
+  }
+
+  try {
+    console.log('[Respiro] Fetch:', SHEET_URL);
+    const res = await fetch(SHEET_URL, { cache: 'no-store' });
+    console.log('[Respiro] Status:', res.status, res.statusText);
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+
+    const text = await res.text();
+    console.log('[Respiro] Resposta (primeiros 250 chars):\n', text.slice(0, 250));
+
+    // 1) se for GVIZ
+    let events = null;
+    if(text.includes('google.visualization.Query.setResponse')){
+      console.warn('[Respiro] Resposta veio em formato GVIZ (setResponse). Parseando como GVIZ...');
+      events = parseGviz(text);
+    }
+
+    // 2) senão, tenta TSV/CSV
+    if(!events){
+      console.log('[Respiro] Tentando parse TSV/CSV...');
+      events = parseTSVorCSV(text);
+    }
+
+    console.log('[Respiro] Eventos parseados:', events);
 
     const today = new Date();
     today.setHours(0,0,0,0);
     console.log('[Respiro] Hoje:', today);
 
-    const parsedRows = dataLines.map(line => {
-      const cols = line.split('\t');
-      console.log('[Linha]', cols);
-
-      return {
-        raw: cols,
-        date: parseBRDate(cols[0]), // Coluna A
-        hour: String(cols[1] ?? '').trim(), // Coluna B
-        active: parseBool(cols[3]) // Coluna D
-      };
-    });
-
-    console.log('[Respiro] Linhas interpretadas:', parsedRows);
-
-    const validUpcoming = parsedRows
+    const upcoming = (events || [])
       .filter(e => {
-        const ok =
-          e.active &&
-          e.date &&
-          e.date >= today;
-
-        console.log(
-          '[Filtro]',
-          e,
-          '=> passa?', ok
-        );
-
+        const ok = !!e.date && e.active === true && e.date >= today;
+        console.log('[Filtro]', e, '=>', ok);
         return ok;
       })
-      .sort((a,b) => a.date - b.date);
+      .sort((a,b) => a.date - b.date)[0];
 
-    console.log('[Respiro] Eventos futuros válidos:', validUpcoming);
-
-    const upcoming = validUpcoming[0];
+    console.log('[Respiro] Próximo:', upcoming);
 
     if(!upcoming){
-      console.warn('[Respiro] Nenhum evento futuro encontrado');
-      el.textContent = 'Próximo encontro a definir.';
+      console.warn('[Respiro] Nenhum evento futuro agendado encontrado.');
+      setFallback();
       return;
     }
 
-    const formatted = upcoming.date.toLocaleDateString('pt-BR', {
+    const formattedDate = upcoming.date.toLocaleDateString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
     });
 
-    el.textContent = `${formatted} • ${upcoming.hour || 'Horário a confirmar'} • Online`;
-
-    console.log('[Respiro] Próximo encontro exibido:', el.textContent);
+    el.textContent = `${formattedDate} • ${upcoming.hour || 'Horário a confirmar'} • Online`;
+    console.log('[Respiro] Render final:', el.textContent);
 
   } catch (err){
     console.error('[Respiro] Erro geral:', err);
-    el.textContent = 'Próximo encontro a definir.';
+    setFallback();
   }
 })();
