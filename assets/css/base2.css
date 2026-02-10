@@ -1,0 +1,71 @@
+:root{
+  /* Base */
+  --bg: #FFF7F0;          /* fundo bem suave pêssego */
+  --surface: #FFFFFF;      /* cards */
+  --text: #1B1B1B;
+  --muted: rgba(27,27,27,.72);
+  --line: rgba(27,27,27,.10);
+
+  /* NOVO: laranja como principal */
+  --accent: #FDF2E7;       /* laranja claro (superfície/realce suave) */
+  --accent-strong: #C66826;/* laranja forte (CTA/ênfase) */
+
+  /* Roxo vira “support”, usado pouco */
+  --support: #D2C2DC;      /* roxo claro só para detalhes */
+  --support-strong: #6D4CFF; /* se quiser 1 detalhe pontual */
+}
+
+/* Ex.: seus meta-items (Duração / Plataforma / Valor) */
+.meta-item{
+  background: rgba(253,242,231,.75); /* laranja claro translúcido */
+  border: 1px solid rgba(198,104,38,.12); /* borda bem sutil */
+  border-radius: 14px;                /* menos “pill de botão” */
+  box-shadow: none;                   /* remove sombra de botão */
+}
+
+.meta-k{ color: rgba(27,27,27,.60); font-weight: 600; }
+.meta-v{ color: var(--text); font-weight: 700; }
+
+.card, .panel{
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.06); /* sombra “de card”, não de botão */
+}
+.btn.primary{
+  background: var(--accent-strong);
+  border: 1px solid rgba(198,104,38,.20);
+  color: #fff;
+  border-radius: 999px;
+  box-shadow: 0 14px 30px rgba(198,104,38,.22);
+}
+
+.btn.primary:hover{
+  transform: translateY(-1px);
+}
+
+.btn.ghost{
+  background: transparent;
+  border: 1px solid rgba(198,104,38,.28);
+  color: rgba(27,27,27,.90);
+}
+
+a.link{
+  color: rgba(198,104,38,.95);
+  text-underline-offset: 3px;
+}
+
+.accent, .badge::before{
+  color: var(--support-strong); /* pouquíssimo uso */
+}
+.section.soft{
+  background: var(--accent); /* laranja claro */
+  border-top: 1px solid rgba(198,104,38,.10);
+  border-bottom: 1px solid rgba(198,104,38,.10);
+}
+
+.section.soft{
+  background:
+    radial-gradient(900px 420px at 20% 10%, rgba(210,194,220,.25), transparent 60%),
+    var(--accent);
+}
