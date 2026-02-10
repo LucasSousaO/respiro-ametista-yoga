@@ -47,7 +47,7 @@
 .next-event {
   padding: 14px 0;
   border-radius: 14px;
-  background: radial-gradient(900px 420px at 20% 10%, rgba(210,194,220,.25), transparent 60%),
+  background: radial-gradient(900px 420px at 20% 10%, rgba(198,104,34,.25), transparent 60%),
     var(--accent);
 }
 
@@ -438,7 +438,7 @@
 ========================= */
 .hero{
   padding: 26px 0 10px;
-  background: linear-gradient(180deg, rgba(109,76,255,.06), rgba(109,76,255,.00));
+  background: linear-gradient(180deg, rgba(198,104,34,.06), rgba(109,76,255,.00));
 }
 
 .hero-grid{
@@ -584,7 +584,7 @@
 }
 
 .section.soft{
-  background: linear-gradient(180deg, rgba(109,76,255,.05), rgba(109,76,255,.00));
+  background: linear-gradient(180deg, rgba(198,104,34,.05), rgba(109,76,255,.00));
 }
 
 .section h2{
