@@ -46,7 +46,7 @@
 }
 .next-event {
   padding: 14px 0;
-  background: rgba(109, 76, 255, 0.06);
+  background: rgba(253,242,231, 0.06);
 }
 
 .next-event-label {
@@ -69,8 +69,8 @@
   display:inline-flex;
   padding:8px 14px;
   border-radius:999px;
-  background:var(--accent-soft);
-  color:var(--accent-ink);
+  background:var(--accent-strong);
+  color:white;
   font-size:13px;
   font-weight:700;
   margin-bottom:14px;
