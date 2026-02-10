@@ -5,7 +5,7 @@
     return;
   }
 
-  const SHEET_ID = '2PACX-1BTaH2aemKS1GigvAOPC2s8oPbgZKr7S7uORQqmtVs9s';
+  const SHEET_ID = '1BTaH2aemKS1GigvAOPC2s8oPbgZKr7S7uORQqmtVs9s';
   const GID = '1239935155';
 
   const URL =
