@@ -470,7 +470,7 @@
 }
 
 .hero .accent{
-  color: var(--accent);
+  color: var(--accent-strong);
 }
 
 .lead{
