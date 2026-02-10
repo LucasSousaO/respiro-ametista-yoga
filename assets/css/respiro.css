@@ -46,7 +46,8 @@
 }
 .next-event {
   padding: 14px 0;
-  background: rgba(253,242,231, 0.06);
+  border-radius: 14px;
+  background: rgba(109, 76, 255, 0.06);
 }
 
 .next-event-label {
@@ -457,7 +458,7 @@
   border-radius: 999px;
   border: 1px solid var(--accent-strong);
   background: var(--accent-strong);
-  color: rgba(31,31,36,.90);
+  color: white;
   font-weight:700;
   font-size: 12px;
 }
