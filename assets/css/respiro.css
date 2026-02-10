@@ -37,9 +37,12 @@
 .footer-inner{
   display:flex;
   align-items:center;
-  justify-content:space-between;
+  justify-content:center;
   gap:16px;
   flex-wrap:wrap;
+}
+.footer-text{
+  justify-items: center;
 }
 .next-event {
   padding: 14px 0;
