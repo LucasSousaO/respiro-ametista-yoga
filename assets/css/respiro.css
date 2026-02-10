@@ -732,7 +732,9 @@
 /* =========================
    CTA Box (menos “promoção”)
 ========================= */
-.cta-box{
+.cta-box1{
+    background:radial-gradient(900px 420px at 20% 10%, rgba(210,194,220,.25), transparent 60%),
+    var(--accent);
   margin-top: 18px;
   padding: 16px;
   border-radius: 20px;
@@ -745,7 +747,7 @@
 
 .cta-box strong{
   display:block;
-  font-size: 14px;
+  font-size: 18px;
   letter-spacing: -0.01em;
 }
 
@@ -878,12 +880,20 @@
     gap: 14px;
   }
 
-  .cta-box{
-    flex-direction: row;
+  .cta-box1{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+    .cta-box{
+flex-direction: row;
     justify-content: space-between;
     align-items: center;
   }
-
+.cta-deep-box{
+  display:contents;
+  justify-items:center;
+}
   .footer{
     padding-bottom: 28px;
   }
