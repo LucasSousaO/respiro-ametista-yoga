@@ -4,7 +4,7 @@
   if(!el) return;
 
   const SHEET_URL =
-    'https://docs.google.com/spreadsheets/d/e/1BTaH2aemKS1GigvAOPC2s8oPbgZKr7S7uORQqmtVs9s/pubhtml?gid=1239935155&single=true&output=tsv';
+    'https://docs.google.com/spreadsheets/d/e/2PACX-1vR1T9RgURIVxLay_Y2B7Ev95KbdZHMfwMu0PW3DRXQY4h6Y9H6EQWQ-IM8wWtc55Fl0vTZBrV0SgsUV/pubhtml?gid=1239935155&single=true';
 
   function parseBRDate(ddmmyyyy){
     console.log('[parseBRDate] valor recebido:', ddmmyyyy);
