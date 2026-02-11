@@ -63,6 +63,7 @@
   font-size: 16px;
   font-weight: 600;
   color: var(--text);
+  margin: 0 0 0px;
 }
 
 
@@ -862,6 +863,10 @@
 }
 .wrap1{
   display:flex;
+  max-width:var(--wrap); 
+  margin:0 auto; 
+  justify-content: space-around;
+  align-items: center;
 }
 /* =========================
    Desktop
