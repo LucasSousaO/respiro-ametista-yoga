@@ -744,7 +744,6 @@
    CTA Box (menos “promoção”)
 ========================= */
 .cta-box{
-  margin-top: 18px;
   padding: 16px;
   border-radius: 20px;
   border: 1px solid rgba(253,242,231,.16);
@@ -754,7 +753,6 @@
   gap: 12px;
 }
 .cta-box1{
-  margin-top: 18px;
   padding: 16px;
   border-radius: 20px;
   border: 1px solid rgba(253,242,231,.16);
