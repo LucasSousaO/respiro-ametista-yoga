@@ -1,10 +1,19 @@
 /* =========================
-   FEEDBACK SLIDER (mobile-first)
+   FEEDBACK SLIDER (mobile-first) — mesmas classes
 ========================= */
 
 .fb-slider{
   position: relative;
   margin-top: 14px;
+}
+
+/* “Container” do slider: limita a largura no desktop pra não ficar gigante */
+@media (min-width: 860px){
+  .fb-slider{
+    max-width: 1120px;
+    margin-left: auto;
+    margin-right: auto;
+  }
 }
 
 .fb-viewport{
@@ -13,15 +22,22 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none; /* Firefox */
   border-radius: 18px;
+
+  /* Importante: não fixe altura -> deixa o conteúdo definir */
+  height: auto;
 }
 .fb-viewport::-webkit-scrollbar{ display:none; }
 
+/* Track: continua grid (como você já usa), mas com ajustes de desktop */
 .fb-track{
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: 88%;
   gap: 12px;
   padding: 6px 2px 10px;
+
+  /* Para evitar “alinhamento estranho” em cards de alturas diferentes */
+  align-items: start;
 }
 
 .fb-card{
@@ -31,6 +47,9 @@
   border-radius: 18px;
   padding: 18px 16px;
   box-shadow: 0 10px 30px rgba(0,0,0,.06);
+
+  /* Não deixa o card esticar “de graça” */
+  height: auto;
 }
 
 .fb-quote{
@@ -44,7 +63,7 @@
   content: "“";
   display: inline-block;
   margin-right: 6px;
-  color: rgba(198,104,38,.75); /* laranja forte sutil */
+  color: rgba(198,104,38,.75);
   font-weight: 800;
 }
 
@@ -85,28 +104,79 @@
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  width: 38px;
-  height: 38px;
+
+  width: 42px;
+  height: 42px;
   border-radius: 999px;
   border: 1px solid rgba(27,27,27,.10);
   background: rgba(255,255,255,.92);
   box-shadow: 0 12px 28px rgba(0,0,0,.10);
+
   cursor: pointer;
   font-size: 22px;
   line-height: 1;
   align-items: center;
   justify-content: center;
+
+  /* Não “roubar” clique do scroll quando estiver em cima */
+  z-index: 5;
 }
 
-.fb-prev{ left: -10px; }
-.fb-next{ right: -10px; }
+.fb-prev{ left: 12px; }
+.fb-next{ right: 12px; }
 
-/* Desktop: cards menores e botões visíveis */
+/* Desktop: 2 cards por vez + setas FORA do conteúdo */
 @media (min-width: 860px){
-  .fb-track{
-    grid-auto-columns: 48%;
-    gap: 14px;
-    padding: 8px 6px 12px;
+  .fb-viewport{
+    border-radius: 24px;
+    /* dá espaço para as setas ficarem fora sem cortar sombra */
+    overflow: visible; /* deixa as setas “pra fora” aparecerem */
   }
-  .fb-nav{ display: inline-flex; }
+
+  .fb-track{
+    /* 2 cards por vez, com gap mais confortável */
+    grid-auto-columns: calc(50% - 10px);
+    gap: 20px;
+
+    /* mais respiro nas laterais para ficar “premium” */
+    padding: 10px 6px 14px;
+  }
+
+  .fb-card{
+    border-radius: 22px;
+    padding: 22px 22px;
+  }
+
+  .fb-quote{
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .fb-nav{
+    display: inline-flex;
+  }
+
+  /* Setas do lado de fora, sem cobrir card */
+  .fb-prev{ left: -56px; }
+  .fb-next{ right: -56px; }
+}
+
+/* Desktop maior: afasta um pouco mais as setas */
+@media (min-width: 1100px){
+  .fb-prev{ left: -64px; }
+  .fb-next{ right: -64px; }
+}
+
+/* Acessibilidade: foco visível */
+.fb-nav:focus-visible,
+.fb-dot:focus-visible{
+  outline: 3px solid rgba(198,104,38,.35);
+  outline-offset: 2px;
+}
+
+/* Preferência por menos movimento */
+@media (prefers-reduced-motion: reduce){
+  .fb-viewport{
+    scroll-behavior: auto;
+  }
 }
