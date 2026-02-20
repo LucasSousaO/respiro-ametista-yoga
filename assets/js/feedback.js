@@ -88,8 +88,8 @@
     }
     if(btnNext){
       // some na última página
-      btnNext.style.display = page >= totalPages - 1 ? 'none' : '';
-      btnNext.setAttribute('aria-disabled', page >= totalPages - 1 ? 'true' : 'false');
+      btnNext.style.display = page >= totalPages - 2 ? 'none' : '';
+      btnNext.setAttribute('aria-disabled', page >= totalPages - 2 ? 'true' : 'false');
     }
   }
 
