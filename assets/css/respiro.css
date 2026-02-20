@@ -413,7 +413,7 @@
   }
 
   .cards{
-    grid-template-columns:repeat(3, 1fr);
+    grid-template-columns:0.75fr 1.2fr 0.75fr;
   }
 
   .sticky-cta{
