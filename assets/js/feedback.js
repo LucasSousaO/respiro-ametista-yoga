@@ -113,6 +113,7 @@ console.log(totalPages + "/" + page);
 
   function step(dir){
     const page = getPageIndexFromScroll();
+    console.log(page);
     scrollToPage(page + dir);
   }
 
