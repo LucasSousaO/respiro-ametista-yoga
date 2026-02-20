@@ -13,103 +13,151 @@
   const cards = Array.from(track.children);
   let dots = [];
 
-  function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+  // Desktop breakpoint tem que bater com o seu CSS (min-width: 860px)
+  const mqDesktop = window.matchMedia('(min-width: 860px)');
 
-  // Índice do card mais próximo do "start" do viewport (funciona mobile e desktop)
-  function getCurrentIndex(){
-    const vpRect = viewport.getBoundingClientRect();
-    const vpLeft = vpRect.left;
-
-    let bestIdx = 0;
-    let bestDist = Infinity;
-
-    for(let i = 0; i < cards.length; i++){
-      const r = cards[i].getBoundingClientRect();
-      const dist = Math.abs(r.left - vpLeft);
-      if(dist < bestDist){
-        bestDist = dist;
-        bestIdx = i;
-      }
-    }
-    return bestIdx;
+  function getPerPage(){
+    // desktop: 2 cards por "página"; mobile: 1
+    return mqDesktop.matches ? 2 : 1;
   }
 
-  function scrollToIndex(i){
-    i = clamp(i, 0, cards.length - 1);
-    const card = cards[i];
-    if(!card) return;
+  function getGapPx(){
+    const cs = window.getComputedStyle(track);
+    // gap pode vir em "gap" ou "columnGap"
+    const gap = cs.columnGap || cs.gap || '0px';
+    return parseFloat(gap) || 0;
+  }
 
-    // Alinha o card no início do viewport
-    card.scrollIntoView({ behavior: 'smooth', inline: 'start', block: 'nearest' });
+  function getCardStep(){
+    // quanto anda para “avançar 1 card” no eixo X
+    // (largura do card + gap)
+    const first = cards[0];
+    if(!first) return viewport.clientWidth;
 
-    // Atualiza UI logo após iniciar o scroll (e de novo no evento scroll)
-    window.requestAnimationFrame(updateUI);
+    const rect = first.getBoundingClientRect();
+    const cardW = rect.width || viewport.clientWidth;
+    const gap = getGapPx();
+
+    return cardW + gap;
+  }
+
+  function getPageStep(){
+    // quanto anda para “avançar 1 página”
+    return getCardStep() * getPerPage();
+  }
+
+  function getTotalPages(){
+    return Math.max(1, Math.ceil(cards.length / getPerPage()));
+  }
+
+  function clamp(n, min, max){
+    return Math.max(min, Math.min(max, n));
+  }
+
+  function getPageIndexFromScroll(){
+    const pageStep = getPageStep();
+    const totalPages = getTotalPages();
+    if(!pageStep) return 0;
+
+    // scrollLeft / pageStep -> página aproximada
+    const raw = Math.round(viewport.scrollLeft / pageStep);
+    return clamp(raw, 0, totalPages - 1);
+  }
+
+  function scrollToPage(i){
+    const totalPages = getTotalPages();
+    const page = clamp(i, 0, totalPages - 1);
+
+    const left = getPageStep() * page;
+    viewport.scrollTo({ left, behavior: 'smooth' });
+  }
+
+  function updateDots(){
+    const page = getPageIndexFromScroll();
+    dots.forEach((d, i) => d.setAttribute('aria-current', i === page ? 'true' : 'false'));
+  }
+
+  function updateArrows(){
+    const page = getPageIndexFromScroll();
+    const totalPages = getTotalPages();
+
+    if(btnPrev){
+      // some na primeira página
+      btnPrev.style.display = page <= 0 ? 'none' : '';
+      btnPrev.setAttribute('aria-disabled', page <= 0 ? 'true' : 'false');
+    }
+    if(btnNext){
+      // some na última página
+      btnNext.style.display = page >= totalPages - 1 ? 'none' : '';
+      btnNext.setAttribute('aria-disabled', page >= totalPages - 1 ? 'true' : 'false');
+    }
   }
 
   function renderDots(){
+    const totalPages = getTotalPages();
+
     dotsWrap.innerHTML = '';
-    dots = cards.map((_, i) => {
+    dots = Array.from({ length: totalPages }, (_, i) => {
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'fb-dot';
-      b.setAttribute('aria-label', `Ir para feedback ${i + 1}`);
-      b.addEventListener('click', () => scrollToIndex(i));
+      b.setAttribute('aria-label', `Ir para feedbacks (página) ${i + 1} de ${totalPages}`);
+      b.addEventListener('click', () => scrollToPage(i));
       dotsWrap.appendChild(b);
       return b;
     });
-    updateUI();
-  }
 
-  function updateDots(idx){
-    if(!dots.length) return;
-    dots.forEach((d, i) => d.setAttribute('aria-current', i === idx ? 'true' : 'false'));
-  }
-
-  function updateArrows(idx){
-    if(btnPrev){
-      const atStart = idx <= 0;
-      btnPrev.style.visibility = atStart ? 'hidden' : 'visible';
-      btnPrev.style.pointerEvents = atStart ? 'none' : 'auto';
-    }
-    if(btnNext){
-      const atEnd = idx >= cards.length - 1;
-      btnNext.style.visibility = atEnd ? 'hidden' : 'visible';
-      btnNext.style.pointerEvents = atEnd ? 'none' : 'auto';
-    }
-  }
-
-  function updateUI(){
-    const idx = getCurrentIndex();
-    updateDots(idx);
-    updateArrows(idx);
+    updateDots();
+    updateArrows();
   }
 
   function step(dir){
-    const idx = getCurrentIndex();
-    scrollToIndex(idx + dir);
+    const page = getPageIndexFromScroll();
+    scrollToPage(page + dir);
   }
 
   btnPrev?.addEventListener('click', () => step(-1));
   btnNext?.addEventListener('click', () => step(1));
 
-  // Scroll manual atualiza dots + setas
-  let raf = 0;
   viewport.addEventListener('scroll', () => {
-    if(raf) cancelAnimationFrame(raf);
-    raf = requestAnimationFrame(updateUI);
+    window.requestAnimationFrame(() => {
+      updateDots();
+      updateArrows();
+    });
   });
 
-  // Teclado (quando focar o viewport)
+  // teclado (quando focar o viewport)
   viewport.addEventListener('keydown', (e) => {
     if(e.key === 'ArrowLeft') step(-1);
     if(e.key === 'ArrowRight') step(1);
   });
 
-  // Resize: só recalcula UI (sem tentar realinhar forçado)
+  // Recalcula dots/posição ao resize e quando troca mobile<->desktop
+  let lastPerPage = getPerPage();
   window.addEventListener('resize', () => {
-    window.requestAnimationFrame(updateUI);
+    const now = getPerPage();
+    if(now !== lastPerPage){
+      lastPerPage = now;
+      renderDots(); // muda quantidade de dots
+    } else {
+      // só atualiza estado
+      updateDots();
+      updateArrows();
+    }
   });
 
+  // Também reage à mudança do media query (alguns browsers disparam melhor que resize)
+  if(typeof mqDesktop.addEventListener === 'function'){
+    mqDesktop.addEventListener('change', () => {
+      lastPerPage = getPerPage();
+      renderDots();
+    });
+  } else if(typeof mqDesktop.addListener === 'function'){
+    mqDesktop.addListener(() => {
+      lastPerPage = getPerPage();
+      renderDots();
+    });
+  }
+
   renderDots();
-  updateUI();
 })();
