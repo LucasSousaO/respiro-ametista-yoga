@@ -72,7 +72,7 @@
       btnPrev.style.pointerEvents = atStart ? 'none' : 'auto';
     }
     if(btnNext){
-      const atEnd = idx >= cards.length % 2 === 0?cards.length - 1:cards.length - 2;
+      const atEnd = idx >= cards.length - 1;
       btnNext.style.visibility = atEnd ? 'hidden' : 'visible';
       btnNext.style.pointerEvents = atEnd ? 'none' : 'auto';
     }
