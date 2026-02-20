@@ -66,7 +66,7 @@
 
   function scrollToPage(i){
     const totalPages = getTotalPages();
-    const page = clamp(i, 0, totalPages - 1);
+    const page = clamp(i, 0, totalPages); // -1
 
     const left = getPageStep() * page;
     viewport.scrollTo({ left, behavior: 'smooth' });
