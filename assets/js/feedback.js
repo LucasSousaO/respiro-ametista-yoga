@@ -80,7 +80,7 @@
   function updateArrows(){
     const page = getPageIndexFromScroll();
     const totalPages = getTotalPages();
-
+console.log(totalPages + "/" + page);
     if(btnPrev){
       // some na primeira página
       btnPrev.style.display = page <= 0 ? 'none' : '';
