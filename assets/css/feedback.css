@@ -98,8 +98,8 @@
   justify-content: center;
 }
 
-.fb-prev{ left: -10px; }
-.fb-next{ right: -10px; }
+.fb-prev{ left: -50px; }
+.fb-next{ right: -50px; }
 
 /* Desktop: cards menores e botões visíveis */
 @media (min-width: 860px){
