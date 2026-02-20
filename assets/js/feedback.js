@@ -13,24 +13,20 @@
   const cards = Array.from(track.children);
   let dots = [];
 
-  // Desktop breakpoint tem que bater com o seu CSS (min-width: 860px)
+  // Desktop breakpoint tem que bater com o CSS (min-width: 860px)
   const mqDesktop = window.matchMedia('(min-width: 860px)');
 
   function getPerPage(){
-    // desktop: 2 cards por "página"; mobile: 1
     return mqDesktop.matches ? 2 : 1;
   }
 
   function getGapPx(){
     const cs = window.getComputedStyle(track);
-    // gap pode vir em "gap" ou "columnGap"
     const gap = cs.columnGap || cs.gap || '0px';
     return parseFloat(gap) || 0;
   }
 
   function getCardStep(){
-    // quanto anda para “avançar 1 card” no eixo X
-    // (largura do card + gap)
     const first = cards[0];
     if(!first) return viewport.clientWidth;
 
@@ -42,7 +38,6 @@
   }
 
   function getPageStep(){
-    // quanto anda para “avançar 1 página”
     return getCardStep() * getPerPage();
   }
 
@@ -54,22 +49,36 @@
     return Math.max(min, Math.min(max, n));
   }
 
+  function getMaxScrollLeft(){
+    // fim real do scroll (importante no desktop)
+    return Math.max(0, viewport.scrollWidth - viewport.clientWidth);
+  }
+
   function getPageIndexFromScroll(){
     const pageStep = getPageStep();
     const totalPages = getTotalPages();
     if(!pageStep) return 0;
 
-    // scrollLeft / pageStep -> página aproximada
-    const raw = Math.round(viewport.scrollLeft / pageStep);
+    const max = getMaxScrollLeft();
+    const sl = viewport.scrollLeft;
+
+    // ✅ FIX 1: se está no final real do scroll, é a última página
+    // tolerância de 2px para variações de layout/zoom
+    if(sl >= max - 2) return totalPages - 1;
+
+    // caso normal
+    const raw = Math.round(sl / pageStep);
     return clamp(raw, 0, totalPages - 1);
   }
 
   function scrollToPage(i){
     const totalPages = getTotalPages();
-    const page = clamp(i, 0, totalPages); // -1
+    const page = clamp(i, 0, totalPages - 1); // ✅ FIX 2: clamp correto
 
-    const left = getPageStep() * page;
-    viewport.scrollTo({ left, behavior: 'smooth' });
+    const max = getMaxScrollLeft();
+    const target = Math.min(getPageStep() * page, max); // ✅ limita pelo fim real
+
+    viewport.scrollTo({ left: target, behavior: 'smooth' });
   }
 
   function updateDots(){
@@ -80,16 +89,13 @@
   function updateArrows(){
     const page = getPageIndexFromScroll();
     const totalPages = getTotalPages();
-console.log(totalPages + "/" + page);
+
     if(btnPrev){
-      // some na primeira página
       btnPrev.style.display = page <= 0 ? 'none' : '';
       btnPrev.setAttribute('aria-disabled', page <= 0 ? 'true' : 'false');
     }
     if(btnNext){
-      // some na última página
       btnNext.style.display = page >= totalPages - 1 ? 'none' : '';
-      console.log("ultima página");
       btnNext.setAttribute('aria-disabled', page >= totalPages - 1 ? 'true' : 'false');
     }
   }
@@ -114,7 +120,6 @@ console.log(totalPages + "/" + page);
 
   function step(dir){
     const page = getPageIndexFromScroll();
-    console.log(page);
     scrollToPage(page + dir);
   }
 
@@ -128,37 +133,30 @@ console.log(totalPages + "/" + page);
     });
   });
 
-  // teclado (quando focar o viewport)
   viewport.addEventListener('keydown', (e) => {
     if(e.key === 'ArrowLeft') step(-1);
     if(e.key === 'ArrowRight') step(1);
   });
 
-  // Recalcula dots/posição ao resize e quando troca mobile<->desktop
   let lastPerPage = getPerPage();
-  window.addEventListener('resize', () => {
+
+  function onLayoutChange(){
     const now = getPerPage();
     if(now !== lastPerPage){
       lastPerPage = now;
-      renderDots(); // muda quantidade de dots
+      renderDots();
     } else {
-      // só atualiza estado
       updateDots();
       updateArrows();
     }
-  });
+  }
 
-  // Também reage à mudança do media query (alguns browsers disparam melhor que resize)
+  window.addEventListener('resize', onLayoutChange);
+
   if(typeof mqDesktop.addEventListener === 'function'){
-    mqDesktop.addEventListener('change', () => {
-      lastPerPage = getPerPage();
-      renderDots();
-    });
+    mqDesktop.addEventListener('change', onLayoutChange);
   } else if(typeof mqDesktop.addListener === 'function'){
-    mqDesktop.addListener(() => {
-      lastPerPage = getPerPage();
-      renderDots();
-    });
+    mqDesktop.addListener(onLayoutChange);
   }
 
   renderDots();
