@@ -89,6 +89,7 @@ console.log(totalPages + "/" + page);
     if(btnNext){
       // some na última página
       btnNext.style.display = page >= totalPages - 1 ? 'none' : '';
+      console.log("ultima página");
       btnNext.setAttribute('aria-disabled', page >= totalPages - 1 ? 'true' : 'false');
     }
   }
